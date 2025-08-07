@@ -1,0 +1,10 @@
+ifconfig eth0 6.6.6.6/24 up
+ip route add 1.2.0.0/20 via 6.6.6.1
+ip route add 5.4.3.0/24 via 6.6.6.2
+
+# ssh-keygen -t rsa -f /root/.ssh/id_rsa
+# cd /root/.ssh
+# ls 
+# chmod 700 id_rsa.pub 
+# ls -l id_rsa.pub 
+# cp id_rsa.pub /shared

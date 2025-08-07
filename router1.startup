@@ -1,0 +1,47 @@
+ifconfig eth0 1.2.2.1/24 up
+ifconfig eth1 6.6.6.1/24 up
+ip route add 1.2.0.0/20 via 1.2.2.2
+ip route add 0.0.0.0/0 via 6.6.6.2
+cp -r /usr/share/easy-rsa /etc/openvpn/
+cp /etc/openvpn/easy-rsa/vars.example /etc/openvpn/easy-rsa/vars
+cd /etc/openvpn/easy-rsa/
+echo 'set_var KEY_COUNTRY "PORTUGAL"' >> vars
+echo 'set_var KEY_CITY "Lisbon"' >> vars
+echo 'set_var KEY_ORG "sirssec"' >> vars
+echo 'set_var KEY_EMAIL "admin@example.com"' >> vars
+echo 'set_var KEY_OU "OpenVPN"' >> vars
+cd ..
+mkdir ccd
+echo "iroute 5.4.3.0 255.255.255.0" >> /etc/openvpn/ccd/client
+cd 
+cd ..
+mv server.conf /etc/openvpn
+chmod +x Sync.sh
+./Sync.sh
+cd /etc/openvpn/easy-rsa/
+./easyrsa init-pki
+echo -en "\n" | ./easyrsa build-ca nopass
+echo -en "\n" | ./easyrsa gen-req server nopass
+echo -en "yes" | ./easyrsa sign-req server server
+mv /shared/client.req /etc/openvpn/easy-rsa/pki/reqs
+echo -en "yes" | ./easyrsa sign-req client client
+./easyrsa gen-dh
+openvpn --genkey --secret ta.key
+cp ta.key /shared
+mv pki/ca.crt /shared
+mv pki/issued/client.crt /shared
+cp ta.key /etc/openvpn
+cp pki/dh.pem /etc/openvpn
+cp pki/ca.crt /etc/openvpn
+cp pki/private/server.key /etc/openvpn
+cp pki/issued/server.crt /etc/openvpn
+cd ..
+mkdir -p /dev/net
+mknod /dev/net/tun c 10 200
+chmod 600 /dev/net/tun
+
+
+
+
+
+
